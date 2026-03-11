@@ -1,0 +1,6 @@
+# Skills submodule placeholder
+#
+# This directory is managed as a git submodule pointing to
+# https://github.com/davidamitchell/Skills.git
+#
+# To initialise: git submodule update --init
