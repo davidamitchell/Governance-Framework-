@@ -1,0 +1,10 @@
+{
+  "version": "0.1.0",
+  "attributes": {
+    "agent_id":            { "type": "string", "description": "Identifier of the agent performing the action" },
+    "branch":             { "type": "string", "description": "Git branch name at time of evaluation" },
+    "environment":        { "type": "string", "allowed": ["production", "staging", "sandbox"], "description": "Deployment environment context" },
+    "data_classification":{ "type": "string", "allowed": ["public", "internal", "confidential", "restricted"], "description": "Classification of data in scope" },
+    "team":               { "type": "string", "description": "Owning team identifier" }
+  }
+}
