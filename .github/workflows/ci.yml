@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # ── OPA unit tests ────────────────────────────────────────────────────────
+  # Runs `opa test ./...` across all Rego files in policies/ and tests/.
+  # All tests must pass before a merge is considered safe.
+  opa-test:
+    name: OPA tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install OPA
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: latest
+
+      - name: Run OPA unit tests
+        run: opa test ./... -v
+
+  # ── Registry lint ─────────────────────────────────────────────────────────
+  # Validates structural correctness of the JSON registry files.
+  # Fails if any invariant entry is missing required fields, or if any
+  # pip-attributes entry is missing type or description.
+  registry-lint:
+    name: Registry lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Lint registry files
+        run: |
+          python - <<'EOF'
+          import json
+          import sys
+
+          errors = []
+
+          # ── invariants.json ──────────────────────────────────────────────
+          required_invariant_fields = ["id", "description", "category", "severity", "policy_file", "rule_id", "status"]
+
+          with open("registry/invariants.json") as f:
+              invariants = json.load(f)
+
+          for entry in invariants:
+              for field in required_invariant_fields:
+                  value = entry.get(field)
+                  if not value or not str(value).strip():
+                      errors.append(
+                          f"invariants.json: entry {entry.get('id', '?')} — field '{field}' is missing or empty"
+                      )
+
+          # ── pip-attributes.json ──────────────────────────────────────────
+          with open("registry/pip-attributes.json") as f:
+              pip = json.load(f)
+
+          attributes = pip.get("attributes", {})
+          for attr_name, attr_def in attributes.items():
+              if not attr_def.get("type", "").strip():
+                  errors.append(
+                      f"pip-attributes.json: attribute '{attr_name}' is missing or has empty 'type'"
+                  )
+              if not attr_def.get("description", "").strip():
+                  errors.append(
+                      f"pip-attributes.json: attribute '{attr_name}' is missing or has empty 'description'"
+                  )
+
+          if errors:
+              print("Registry lint FAILED:")
+              for e in errors:
+                  print(f"  {e}")
+              sys.exit(1)
+          else:
+              print(f"Registry lint passed: {len(invariants)} invariants, {len(attributes)} pip-attributes.")
+          EOF
+
+  # ── Coverage report ───────────────────────────────────────────────────────
+  # Cross-references invariants.json against Agent-Evaluation scenario IDs.
+  # Informational only — does not block on coverage gaps.
+  coverage-report:
+    name: Coverage report
+    runs-on: ubuntu-latest
+    needs: [opa-test, registry-lint]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Report coverage gaps
+        run: python scripts/check_coverage.py
+        continue-on-error: true

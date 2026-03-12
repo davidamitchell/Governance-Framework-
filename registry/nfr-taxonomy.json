@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0",
+  "categories": {
+    "security": {
+      "fields": {
+        "auth-required": { "type": "boolean" },
+        "auth-scheme": { "type": "string", "allowed": ["fapi-2", "oauth2", "none"] },
+        "data-classification": { "type": "string", "allowed": ["public", "internal", "confidential", "restricted"] }
+      }
+    },
+    "observability": {
+      "fields": {
+        "trace-required": { "type": "boolean" },
+        "audit-log-required": { "type": "boolean" }
+      }
+    },
+    "reliability": {
+      "fields": {
+        "sla-tier": { "type": "string", "allowed": ["critical", "standard", "best-effort"] }
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "INV-0001",
+    "description": "No file committed to source control may contain a hardcoded credential (API key, secret, password, or access token) as a literal string value.",
+    "category": "security",
+    "severity": "error",
+    "policy_file": "policies/security.rego",
+    "rule_id": "hardcoded-credential",
+    "context_attributes": [],
+    "nfr_taxonomy_refs": ["security.data-classification"],
+    "agent_evaluation": {
+      "scenario_ids": []
+    },
+    "status": "active",
+    "added": "2026-03-11",
+    "updated": "2026-03-11"
+  },
+  {
+    "id": "INV-0002",
+    "description": "All Markdown files committed to a repository must use SCREAMING_SNAKE_CASE naming (e.g. README.md, BACKLOG.md). Files named in any other case must be renamed.",
+    "category": "architecture",
+    "severity": "error",
+    "policy_file": "policies/filenames.rego",
+    "rule_id": "markdown-naming-violation",
+    "context_attributes": [],
+    "nfr_taxonomy_refs": [],
+    "agent_evaluation": {
+      "scenario_ids": []
+    },
+    "status": "active",
+    "added": "2026-03-11",
+    "updated": "2026-03-11"
+  },
+  {
+    "id": "INV-0003",
+    "description": "Non-test Go source files must begin with a package-level comment (either a line comment starting with // or a block comment starting with /*). Test files ending in _test.go are exempt.",
+    "category": "quality",
+    "severity": "warning",
+    "policy_file": "policies/content.rego",
+    "rule_id": "missing-package-comment",
+    "context_attributes": [],
+    "nfr_taxonomy_refs": [],
+    "agent_evaluation": {
+      "scenario_ids": []
+    },
+    "status": "active",
+    "added": "2026-03-11",
+    "updated": "2026-03-11"
+  }
+]
